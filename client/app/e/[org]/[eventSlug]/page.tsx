@@ -179,7 +179,7 @@ export default function EventPage() {
       </div>
 
       {/* Content */}
-      <div className="mx-auto max-w-[var(--container-xl)] px-4 sm:px-6">
+      <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
         {/* Tabs */}
         <Tabs tabs={TABS} value={activeTab} onChange={setActiveTab} className="mt-0 border-b-0 border-[var(--border-default)]" />
 

@@ -255,7 +255,7 @@ export type ButtonSize = "sm" | "md" | "lg";
 
 export type InputSize = "sm" | "md" | "lg";
 
-export type UserRole = "USER" | "ADMIN" | "JUDGE" | "GUEST";
+export type UserRole = "USER" | "ADMIN" | "JUDGE" | "ORGANIZER" | "PARTICIPANT" | "GUEST";
 
 // State-based CTA shape (used by lib/states.ts)
 export interface StateCTA {

@@ -39,8 +39,9 @@ function FormRoot<T extends FieldValues>({
   children,
   className,
 }: FormProps<T>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const methods = useRHF<T>({
-    resolver: zodResolver(schema) as any,
+    resolver: zodResolver(schema as any) as any,
     defaultValues,
   });
 
