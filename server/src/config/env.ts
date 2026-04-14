@@ -1,7 +1,6 @@
 /**
  * server/src/config/env.ts
- * Loads and validates all environment variables at startup.
- * The app will crash early with a clear message if any required variable is missing.
+ * Fail-fast environment variable validation.
  */
 
 import dotenv from "dotenv";
@@ -24,17 +23,36 @@ export const env = {
   NODE_ENV: optional("NODE_ENV", "development"),
   PORT: parseInt(optional("PORT", "5000"), 10),
 
+  // Database
   DATABASE_URL: required("DATABASE_URL"),
 
-  JWT_ACCESS_SECRET: required("JWT_ACCESS_SECRET"),
-  JWT_REFRESH_SECRET: required("JWT_REFRESH_SECRET"),
-  JWT_ACCESS_EXPIRES_IN: optional("JWT_ACCESS_EXPIRES_IN", "15m"),
-  JWT_REFRESH_EXPIRES_IN: optional("JWT_REFRESH_EXPIRES_IN", "7d"),
+  // Clerk
+  CLERK_SECRET_KEY: required("CLERK_SECRET_KEY"),
+  CLERK_WEBHOOK_SECRET: optional("CLERK_WEBHOOK_SECRET", ""),
 
-  ALLOWED_ORIGINS: optional("ALLOWED_ORIGINS", "http://localhost:3000")
-    .split(",")
-    .map((o) => o.trim()),
+  // Super Admin
+  SUPER_ADMIN_EMAIL: optional("SUPER_ADMIN_EMAIL", ""),
+  SUPER_ADMIN_ALLOWED_DOMAINS: optional("SUPER_ADMIN_ALLOWED_DOMAINS", ""),
 
+  // Cloudinary
+  CLOUDINARY_CLOUD_NAME: required("CLOUDINARY_CLOUD_NAME"),
+  CLOUDINARY_API_KEY: required("CLOUDINARY_API_KEY"),
+  CLOUDINARY_API_SECRET: required("CLOUDINARY_API_SECRET"),
+
+  // Email
+  EMAIL_PROVIDER: optional("EMAIL_PROVIDER", "resend"),
+  RESEND_API_KEY: optional("RESEND_API_KEY", ""),
+
+  SMTP_HOST: optional("SMTP_HOST", ""),
+  SMTP_PORT: parseInt(optional("SMTP_PORT", "587"), 10),
+  SMTP_USER: optional("SMTP_USER", ""),
+  SMTP_PASS: optional("SMTP_PASS", ""),
+
+  // Config
+  APP_URL: optional("APP_URL", "http://localhost:5000"),
+  CLIENT_URL: optional("CLIENT_URL", "http://localhost:3000"),
+
+  // Security
   RATE_LIMIT_WINDOW_MS: parseInt(optional("RATE_LIMIT_WINDOW_MS", "900000"), 10),
   RATE_LIMIT_MAX: parseInt(optional("RATE_LIMIT_MAX", "100"), 10),
 

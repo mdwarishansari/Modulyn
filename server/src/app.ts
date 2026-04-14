@@ -14,6 +14,7 @@ import rateLimit from "express-rate-limit";
 import { env } from "@config/env";
 import { requestLogger } from "@middlewares/requestLogger";
 import { notFound } from "@middlewares/notFound";
+import { clerkMiddleware } from "@clerk/express";
 import { errorHandler } from "@middlewares/errorHandler";
 import apiRouter from "@/routes/index";
 
@@ -25,7 +26,7 @@ export function createApp(): Application {
 
   app.use(
     cors({
-      origin: env.ALLOWED_ORIGINS,
+      origin: env.CLIENT_URL,
       credentials: true,
     })
   );
@@ -44,6 +45,10 @@ export function createApp(): Application {
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
   app.use(compression());
+
+  // ─── Authentication ───────────────────────────────────────────────────────────
+  // Clerk implicitly handles session verification locally and safely mounts auth on req.
+  app.use(clerkMiddleware());
 
   // ─── Logging ────────────────────────────────────────────────────────────────
   app.use(requestLogger);
