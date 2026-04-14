@@ -1,26 +1,22 @@
 /**
  * server/src/modules/event/event.routes.ts
- * Event module route definitions.
+ * Standard routing resolving endpoints natively back to the controller.
  */
 
 import { Router } from "express";
-// import { createEvent, getEvents, getEvent, updateEvent, deleteEvent } from "./event.controller";
+import { requireAuth } from "@middlewares/auth/requireAuth";
+import { optionalAuth } from "@middlewares/auth/optionalAuth";
+import * as eventController from "./event.controller";
 
 const router = Router();
 
-// GET    /api/v1/events
-// router.get("/", getEvents);
+// ─── Public ─────────────────────────────────────────────────────────────
+// (optionalAuth checks if logged in for potential UI tracking, but doesn't block)
+router.get("/", optionalAuth, eventController.listPublicEvents);
+router.get("/:orgId/:slug", optionalAuth, eventController.getEventBySlug);
 
-// POST   /api/v1/events
-// router.post("/", createEvent);
-
-// GET    /api/v1/events/:slug
-// router.get("/:slug", getEvent);
-
-// PATCH  /api/v1/events/:id
-// router.patch("/:id", updateEvent);
-
-// DELETE /api/v1/events/:id
-// router.delete("/:id", deleteEvent);
+// ─── Protected ──────────────────────────────────────────────────────────
+router.post("/", requireAuth, eventController.createEvent);
+router.patch("/:eventId/state", requireAuth, eventController.transitionEventState);
 
 export default router;

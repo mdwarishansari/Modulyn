@@ -1,43 +1,67 @@
 /**
  * server/src/modules/module/core/module.controller.ts
- * Core module controller — handles shared CRUD and lifecycle transitions.
- * Delegates all business logic to module.service.ts
+ * Standard routing interface parsing input directly resolving against native validation bindings securely.
  */
 
-// import { asyncHandler }     from "@utils/asyncHandler";
-// import { sendSuccess, sendCreated } from "@utils/response";
-// import * as ModuleService   from "./module.service";
+import { Request, Response } from "express";
+import { asyncHandler } from "@utils/asyncHandler";
+import { moduleCoreService } from "./module.service";
+import { createModuleSchema } from "./module.validation";
+import { ModuleState } from "@prisma/client";
 
-// export const listModules = asyncHandler(async (req, res) => {
-//   const { eventId } = req.query;
-//   const modules = await ModuleService.listModules(eventId as string);
-//   sendSuccess(res, modules);
-// });
+export const createModule = asyncHandler(async (req: Request, res: Response) => {
+  const { body } = createModuleSchema.parse({ body: req.body });
 
-// export const createModule = asyncHandler(async (req, res) => {
-//   const module = await ModuleService.createModule(req.body, req.user.id);
-//   sendCreated(res, module, "Module created");
-// });
+  try {
+    const newModule = await moduleCoreService.createModule({
+      ...body,
+      configJsonb: body.configJsonb || {},
+      createdById: req.user!.id,
+    }, req.user!.id);
 
-// export const getModule = asyncHandler(async (req, res) => {
-//   const module = await ModuleService.getModuleById(req.params.id);
-//   sendSuccess(res, module);
-// });
+    res.status(201).json({
+      success: true,
+      data: newModule,
+    });
+  } catch (error: any) {
+    if (error.message.includes("UNAUTHORIZED_ACCESS")) {
+      res.status(403).json({ success: false, message: error.message });
+      return;
+    }
+    throw error;
+  }
+});
 
-// export const updateModule = asyncHandler(async (req, res) => {
-//   const module = await ModuleService.updateModule(req.params.id, req.body);
-//   sendSuccess(res, module, "Module updated");
-// });
+export const getEventModules = asyncHandler(async (req: Request, res: Response) => {
+  const { eventId } = req.params;
+  const modulesObj = await moduleCoreService.getModulesByEventId(eventId as string);
 
-// export const deleteModule = asyncHandler(async (req, res) => {
-//   await ModuleService.deleteModule(req.params.id);
-//   sendSuccess(res, null, "Module deleted");
-// });
+  res.status(200).json({
+    success: true,
+    data: modulesObj,
+  });
+});
 
-// ─── Lifecycle transitions ────────────────────────────────────────────────────
-// export const openRegistration  = asyncHandler(async (req, res) => { ... });
-// export const closeRegistration = asyncHandler(async (req, res) => { ... });
-// export const goLive            = asyncHandler(async (req, res) => { ... });
-// export const finish            = asyncHandler(async (req, res) => { ... });
+export const transitionModuleState = asyncHandler(async (req: Request, res: Response) => {
+  const { moduleId } = req.params;
+  const { state } = req.body;
 
-export {};
+  try {
+    const alteredMod = await moduleCoreService.transitionState(moduleId as string, state as ModuleState, req.user!.id);
+
+    res.status(200).json({
+      success: true,
+      data: alteredMod,
+    });
+  } catch (error: any) {
+    if (error.message.includes("UNAUTHORIZED_ACCESS")) {
+      res.status(403).json({ success: false, message: error.message });
+      return;
+    }
+    if (error.message.includes("Invalid state transition")) {
+      res.status(400).json({ success: false, message: error.message });
+      return;
+    }
+    throw error;
+  }
+});

@@ -104,6 +104,20 @@ enum ModuleMode {
   HYBRID
 }
 
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  WAITLISTED
+  CANCELLED
+  REJECTED
+}
+
+enum TeamStatus {
+  INCOMPLETE
+  COMPLETE
+  DISQUALIFIED
+}
+
 enum ModuleState {
   INACTIVE
   DRAFT
@@ -132,6 +146,8 @@ model User {
   createdEvents   Event[]
   createdModules  Module[]
   createdOrgs     Organization[]       @relation("OrgOwner")
+  registrations   Registration[]
+  teamMemberships TeamMember[]
 
   @@map("users")
 }
@@ -257,6 +273,59 @@ model Module {
   parentModule Module? @relation("ModuleHierarchy", fields: [parentModuleId], references: [id])
   subModules   Module[] @relation("ModuleHierarchy")
 
+  teams         Team[]
+  registrations Registration[]
+
   @@unique([eventId, slug])
   @@map("modules")
+}
+
+// ─── Registration & Teams ─────────────────────────────────────────────────────
+
+model Team {
+  id          String     @id @default(uuid())
+  moduleId    String
+  name        String
+  code        String     @unique 
+  status      TeamStatus @default(INCOMPLETE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  module       Module       @relation(fields: [moduleId], references: [id])
+  members      TeamMember[]
+  registration Registration? 
+
+  @@unique([moduleId, name])
+  @@map("teams")
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  teamId    String
+  userId    String
+  isLeader  Boolean  @default(false)
+  joinedAt  DateTime @default(now())
+
+  team      Team     @relation(fields: [teamId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+model Registration {
+  id        String             @id @default(uuid())
+  moduleId  String
+  userId    String?            
+  teamId    String?            @unique
+  status    RegistrationStatus @default(PENDING)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  module    Module @relation(fields: [moduleId], references: [id])
+  user      User?  @relation(fields: [userId], references: [id])
+  team      Team?  @relation(fields: [teamId], references: [id])
+
+  @@unique([moduleId, userId])
+  @@map("registrations")
 }
