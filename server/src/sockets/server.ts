@@ -43,9 +43,12 @@ export function setupSocketIO(server: HttpServer) {
   });
 
   io.on("connection", (socket: Socket) => {
-    console.log(`[Socket] Authorized mapped client securely inherently gracefully effectively elegantly effectively implicitly cleanly logically smoothly flawlessly effortlessly natively seamlessly flawlessly cleanly dynamically: ${socket.data.userId}`);
-    
-    // Mount sub-rooms
+    const userId = socket.data.userId as string;
+    console.log(`[Socket] User connected: ${userId}`);
+
+    // Auto-join personal notification room
+    socket.join(`user:${userId}`);
+
     socket.on("join:event", (eventId: string) => {
       socket.join(`event:${eventId}`);
     });
@@ -54,7 +57,9 @@ export function setupSocketIO(server: HttpServer) {
       socket.join(`module:${moduleId}`);
     });
 
-    socket.on("disconnect", () => {});
+    socket.on("disconnect", () => {
+      console.log(`[Socket] User disconnected: ${userId}`);
+    });
   });
 
   // Load bridging logic

@@ -21,7 +21,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (!isLoaded || !isSignedIn) {
     return (
       <div className="min-h-dvh flex items-center justify-center bg-[var(--bg-base)]">
-        <Loader.Spinner size="lg" />
+        <Loader size="lg" />
       </div>
     );
   }

@@ -9,6 +9,7 @@ import { env } from "@config/env";
 import { createApp } from "./app";
 import prisma from "@lib/prisma";
 import { setupSocketIO } from "./sockets/server";
+import { startScheduler } from "./jobs/scheduler";
 
 async function main(): Promise<void> {
   // ─── Validate DB connection ────────────────────────────────────────────────
@@ -20,6 +21,7 @@ async function main(): Promise<void> {
   const server = http.createServer(app);
 
   setupSocketIO(server);
+  startScheduler();
 
   server.listen(env.PORT, () => {
     console.log(`[Server] Modulyn API + Socket.IO running in ${env.NODE_ENV} mode`);

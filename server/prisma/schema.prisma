@@ -126,6 +126,15 @@ enum SubmissionStatus {
   REJECTED
 }
 
+enum NotificationType {
+  EVENT_STARTED
+  MODULE_LIVE
+  RESULT_PUBLISHED
+  TEAM_INVITE
+  SUBMISSION_EVALUATED
+  GENERAL
+}
+
 enum ModuleState {
   INACTIVE
   DRAFT
@@ -158,6 +167,7 @@ model User {
   teamMemberships TeamMember[]
   submissions     Submission[]
   auditLogs       AuditLog[]
+  notifications   Notification[]
 
   @@map("users")
 }
@@ -379,4 +389,19 @@ model AuditLog {
   module Module? @relation(fields: [moduleId], references: [id])
 
   @@map("audit_logs")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  isRead    Boolean          @default(false)
+  metadata  Json             @default("{}")
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
 }

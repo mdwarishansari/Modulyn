@@ -1,11 +1,16 @@
 /**
  * server/src/modules/user/user.routes.ts
  */
+
 import { Router } from "express";
+import { requireAuth } from "@middlewares/auth/requireAuth";
+import { optionalAuth } from "@middlewares/auth/optionalAuth";
+import * as userController from "./user.controller";
+
 const router = Router();
 
-// GET    /api/v1/users/me
-// PATCH  /api/v1/users/me
-// GET    /api/v1/users/:username  (public profile)
+router.get("/me", requireAuth, userController.getMe);
+router.patch("/me", requireAuth, userController.updateMe);
+router.get("/:username", optionalAuth, userController.getPublicProfile);
 
 export default router;
