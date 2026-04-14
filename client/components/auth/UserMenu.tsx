@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
@@ -72,16 +73,24 @@ export function UserMenu() {
             <Button
               variant="ghost"
               className="w-full justify-start text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-              onClick={() => {
-                setIsOpen(false);
-                // Future profile navigation logic
-              }}
+              asChild
             >
-              Profile Options
+              <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                Dashboard
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              asChild
+            >
+              <Link href="/dashboard/registrations" onClick={() => setIsOpen(false)}>
+                My Registrations
+              </Link>
             </Button>
             <Button
               variant="danger"
-              className="w-full justify-start opacity-90"
+              className="w-full justify-start opacity-90 mt-1"
               onClick={handleSignOut}
             >
               Log out

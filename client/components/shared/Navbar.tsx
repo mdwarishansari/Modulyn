@@ -74,6 +74,15 @@ export function Navbar() {
 
         {/* Right: theme + bell + auth + hamburger */}
         <div className="flex items-center gap-1.5">
+          <Show when="signed-in">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-[var(--accent-500)] hover:text-[var(--accent-600)] hidden sm:flex px-2 py-1.5 transition-colors"
+            >
+              Dashboard
+            </Link>
+          </Show>
+
           <ThemeToggle />
 
           <Show when="signed-in">
