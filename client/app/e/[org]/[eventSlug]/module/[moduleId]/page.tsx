@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { Modal } from "@/components/ui/Modal";
+import { FetchError } from "@/components/ui/FetchError";
 import { StateBadge } from "@/components/shared/StateBadge";
 import { LeaderboardRowSkeleton } from "@/components/ui/Skeleton";
 import { Loader } from "@/components/ui/Loader";
@@ -232,7 +233,7 @@ export default function ModulePage() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const { module, isLoading } = useModule(params.moduleId);
+  const { module, isLoading, error: moduleError, refetch } = useModule(params.moduleId);
   const { submission, refetch: refetchSubmission } = useMySubmission(params.moduleId);
   const { isRegistered } = useIsRegistered(params.moduleId);
   const { submit, isLoading: isSubmitting } = useSubmit();
@@ -252,9 +253,21 @@ export default function ModulePage() {
     return <div className="flex items-center justify-center min-h-[60vh]"><Loader size="lg" /></div>;
   }
 
+  if (moduleError) {
+    return (
+      <div className="mx-auto max-w-[1200px] px-4 py-20">
+        <FetchError
+          title="Failed to load module"
+          message={moduleError.message ?? "Could not load this module. Please try again."}
+          onRetry={refetch}
+        />
+      </div>
+    );
+  }
+
   if (!module) {
     return (
-      <div className="mx-auto max-w-[var(--container-xl)] px-4 py-20">
+      <div className="mx-auto max-w-[1200px] px-4 py-20">
         <EmptyState title="Module not found" description="This module doesn't exist or has been removed." />
       </div>
     );

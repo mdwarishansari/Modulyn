@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/Toast";
 import { Tabs } from "@/components/ui/Tabs";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { FetchError } from "@/components/ui/FetchError";
 import { StateBadge } from "@/components/shared/StateBadge";
 import { ModuleCard } from "@/components/shared/ModuleCard";
 import { EmptyState } from "@/components/shared/EmptyState";
@@ -129,7 +130,7 @@ function LeaderboardTab({ modules }: { modules: Module[] }) {
 
 export default function EventPage() {
   const params = useParams<{ org: string; eventSlug: string }>();
-  const { event, isLoading: eventLoading } = useEvent(params.org, params.eventSlug);
+  const { event, isLoading: eventLoading, error: eventError, refetch } = useEvent(params.org, params.eventSlug);
   const { modules, isLoading: modulesLoading } = useModules(event?.id);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -148,9 +149,21 @@ export default function EventPage() {
     );
   }
 
+  if (eventError) {
+    return (
+      <div className="mx-auto max-w-[1200px] px-4 py-20">
+        <FetchError
+          title="Failed to load event"
+          message={eventError.message ?? "Could not load this event. Please try again."}
+          onRetry={refetch}
+        />
+      </div>
+    );
+  }
+
   if (!event) {
     return (
-      <div className="mx-auto max-w-[var(--container-xl)] px-4 py-20">
+      <div className="mx-auto max-w-[1200px] px-4 py-20">
         <EmptyState title="Event not found" description="This event doesn't exist or has been removed." />
       </div>
     );
