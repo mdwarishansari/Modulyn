@@ -16,6 +16,7 @@ import registrationRoutes from "@modules/registration/registration.routes";
 import teamRoutes         from "@modules/team/team.routes";
 import submissionRoutes   from "@modules/submission/submission.routes";
 import leaderboardRoutes  from "@modules/leaderboard/leaderboard.routes";
+import notificationRoutes from "@modules/notification/notification.routes";
 
 const router = Router();
 
@@ -37,5 +38,6 @@ router.use("/registrations", registrationRoutes);
 router.use("/teams",         teamRoutes);
 router.use("/submissions",   submissionRoutes);
 router.use("/leaderboard",   leaderboardRoutes);
+router.use("/notifications", notificationRoutes);
 
 export default router;

@@ -9,6 +9,8 @@ import { moduleCoreService } from "./module.service";
 import { createModuleSchema } from "./module.validation";
 import { ModuleState } from "@prisma/client";
 import prisma from "@lib/prisma";
+import { eventBus, DomainEvent } from "@lib/event-bus/eventBus";
+import { auditService } from "@modules/audit/audit.service";
 
 export const createModule = asyncHandler(async (req: Request, res: Response) => {
   const { body } = createModuleSchema.parse({ body: req.body });
@@ -92,6 +94,9 @@ export const publishResults = asyncHandler(async (req: Request, res: Response) =
     where: { id: moduleId as string },
     data: { resultPublished: true }
   });
+
+  eventBus.emitEvent(DomainEvent.RESULT_PUBLISHED, { moduleId });
+  await auditService.log("RESULT_PUBLISHED", req.user!.id, moduleId as string);
 
   res.status(200).json({ success: true, data: updated });
 });

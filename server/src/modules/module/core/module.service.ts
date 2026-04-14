@@ -6,6 +6,8 @@
 import prisma from "@lib/prisma";
 import { Prisma, ModuleState } from "@prisma/client";
 import { resolveHandler } from "@lib/module-engine/resolver";
+import { eventBus, DomainEvent } from "@lib/event-bus/eventBus";
+import { auditService } from "@modules/audit/audit.service";
 
 // Must define lifecycle rules exactly mapped to specific events.
 const VALID_MODULE_TRANSITIONS: Record<ModuleState, ModuleState[]> = {
@@ -84,10 +86,15 @@ export class ModuleCoreService {
       await handler.onStateChange(moduleId, modObj.state, targetState);
     }
 
-    return prisma.module.update({
+    const updated = await prisma.module.update({
       where: { id: moduleId },
       data: { state: targetState },
     });
+
+    eventBus.emitEvent(DomainEvent.MODULE_STATE_CHANGED, { moduleId, oldState: modObj.state, newState: targetState });
+    await auditService.log("MODULE_STATE_CHANGED", requestorId, moduleId, { oldState: modObj.state, newState: targetState });
+
+    return updated;
   }
 }
 

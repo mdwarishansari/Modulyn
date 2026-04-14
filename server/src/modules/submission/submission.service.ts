@@ -6,6 +6,8 @@
 import prisma from "@lib/prisma";
 import { resolveHandler } from "@lib/module-engine/resolver";
 import { ModuleState } from "@prisma/client";
+import { eventBus, DomainEvent } from "@lib/event-bus/eventBus";
+import { auditService } from "@modules/audit/audit.service";
 
 export class SubmissionService {
   /**
@@ -63,7 +65,7 @@ export class SubmissionService {
     const result = await handler.submit(moduleId, userId, payload);
 
     // Persist the normalized submission
-    return prisma.submission.create({
+    const newSubmission = await prisma.submission.create({
       data: {
         moduleId,
         userId: teamId ? null : userId,
@@ -74,6 +76,14 @@ export class SubmissionService {
         evaluatedAt: result.status === "auto-evaluated" ? new Date() : null,
       },
     });
+
+    eventBus.emitEvent(DomainEvent.SUBMISSION_CREATED, { moduleId, submissionId: newSubmission.id });
+    
+    if (newSubmission.status === "EVALUATED") {
+      eventBus.emitEvent(DomainEvent.LEADERBOARD_UPDATED, { moduleId });
+    }
+
+    return newSubmission;
   }
 
   /**
@@ -133,7 +143,7 @@ export class SubmissionService {
 
     const result = await handler.evaluate(submissionId);
 
-    return prisma.submission.update({
+    const updatedSub = await prisma.submission.update({
       where: { id: submissionId },
       data: {
         score: result.score,
@@ -143,6 +153,11 @@ export class SubmissionService {
         evaluatedAt: new Date(),
       },
     });
+
+    eventBus.emitEvent(DomainEvent.LEADERBOARD_UPDATED, { moduleId: submission.module.id });
+    await auditService.log("EVALUATE_SUBMISSION", evaluatorId, submission.module.id, { submissionId, newScore: result.score });
+
+    return updatedSub;
   }
 }
 
