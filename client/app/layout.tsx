@@ -7,6 +7,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
+import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import "./globals.css";
 
 const inter = Inter({
@@ -84,7 +85,18 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-dvh flex flex-col bg-[var(--bg-base)] text-[var(--text-primary)] antialiased">
-        {children}
+        <ClerkProvider>
+          <header className="flex justify-end p-4 gap-4 border-b border-[var(--border-subtle)]">
+            <Show when="signed-out">
+              <SignInButton />
+              <SignUpButton />
+            </Show>
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
+          </header>
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );
