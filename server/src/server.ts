@@ -4,9 +4,11 @@
  * Performs graceful shutdown on SIGTERM / SIGINT.
  */
 
+import http from "http";
 import { env } from "@config/env";
 import { createApp } from "./app";
 import prisma from "@lib/prisma";
+import { setupSocketIO } from "./sockets/server";
 
 async function main(): Promise<void> {
   // ─── Validate DB connection ────────────────────────────────────────────────
@@ -15,9 +17,12 @@ async function main(): Promise<void> {
 
   // ─── Start server ─────────────────────────────────────────────────────────
   const app = createApp();
+  const server = http.createServer(app);
 
-  const server = app.listen(env.PORT, () => {
-    console.log(`[Server] Modulyn API running in ${env.NODE_ENV} mode`);
+  setupSocketIO(server);
+
+  server.listen(env.PORT, () => {
+    console.log(`[Server] Modulyn API + Socket.IO running in ${env.NODE_ENV} mode`);
     console.log(`[Server] Listening on http://localhost:${env.PORT}`);
     console.log(`[Server] Health → http://localhost:${env.PORT}/api/v1/health`);
   });
