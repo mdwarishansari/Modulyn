@@ -1,4 +1,134 @@
 /**
  * server/src/modules/submission/submission.service.ts
+ * Core submission orchestration — delegates payload processing to ModuleHandlers.
  */
-export {};
+
+import prisma from "@lib/prisma";
+import { resolveHandler } from "@lib/module-engine/resolver";
+import { ModuleState } from "@prisma/client";
+
+export class SubmissionService {
+  /**
+   * Creates a submission for a module, enforcing:
+   * 1) Module must be LIVE
+   * 2) User must be registered
+   * 3) No duplicate submissions (raises P2002 which controller catches)
+   * 4) Delegates payload validation + normalization to the ModuleHandler
+   */
+  async createSubmission(
+    moduleId: string,
+    userId: string,
+    payload: Record<string, unknown>,
+    teamId?: string
+  ) {
+    const mod = await prisma.module.findUnique({
+      where: { id: moduleId },
+      include: { event: true },
+    });
+
+    if (!mod) throw new Error("Module not found");
+
+    // Lifecycle gate — must be LIVE
+    if (mod.state !== ModuleState.LIVE) {
+      throw new Error(
+        `Submissions are not accepted. Module state is '${mod.state}'. Must be LIVE.`
+      );
+    }
+
+    // Event must also not be finished/archived
+    if (["FINISHED", "ARCHIVED"].includes(mod.event.state)) {
+      throw new Error(`Event is '${mod.event.state}'. Submissions are closed.`);
+    }
+
+    // Registration gate — user must be registered for this module
+    const registration = await prisma.registration.findFirst({
+      where: {
+        moduleId,
+        OR: [{ userId }, { team: { members: { some: { userId } } } }],
+        status: "CONFIRMED",
+      },
+    });
+
+    if (!registration) {
+      throw new Error("You must be a confirmed registrant to submit to this module.");
+    }
+
+    // Resolve handler and delegate the actual submission logic
+    const handler = resolveHandler(mod.type);
+
+    if (!handler.submit) {
+      throw new Error(`Module type '${mod.type}' does not support submissions`);
+    }
+
+    const result = await handler.submit(moduleId, userId, payload);
+
+    // Persist the normalized submission
+    return prisma.submission.create({
+      data: {
+        moduleId,
+        userId: teamId ? null : userId,
+        teamId: teamId ?? null,
+        contentJsonb: result.contentJsonb as object,
+        score: result.score ?? null,
+        status: (result.status === "auto-evaluated" ? "EVALUATED" : "SUBMITTED") as any,
+        evaluatedAt: result.status === "auto-evaluated" ? new Date() : null,
+      },
+    });
+  }
+
+  /**
+   * Lists submissions for a module — admin/judge view.
+   */
+  async getSubmissionsForModule(moduleId: string) {
+    return prisma.submission.findMany({
+      where: { moduleId },
+      orderBy: { submittedAt: "desc" },
+      include: {
+        user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        team: { select: { id: true, name: true } },
+      },
+    });
+  }
+
+  /**
+   * Gets a single user submission for a module.
+   */
+  async getUserSubmission(moduleId: string, userId: string) {
+    return prisma.submission.findFirst({
+      where: { moduleId, userId },
+    });
+  }
+
+  /**
+   * Triggers evaluate() hook on a specific submission.
+   * Used by judges/admins post-LIVE.
+   */
+  async evaluateSubmission(submissionId: string) {
+    const submission = await prisma.submission.findUnique({
+      where: { id: submissionId },
+      include: { module: true },
+    });
+
+    if (!submission) throw new Error("Submission not found");
+
+    const handler = resolveHandler(submission.module.type);
+
+    if (!handler.evaluate) {
+      throw new Error(`Module type '${submission.module.type}' does not support manual evaluation`);
+    }
+
+    const result = await handler.evaluate(submissionId);
+
+    return prisma.submission.update({
+      where: { id: submissionId },
+      data: {
+        score: result.score,
+        feedback: result.feedback ?? null,
+        status: "EVALUATED",
+        evaluatedAt: new Date(),
+      },
+    });
+  }
+}
+
+export const submissionService = new SubmissionService();

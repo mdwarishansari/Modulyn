@@ -118,6 +118,14 @@ enum TeamStatus {
   DISQUALIFIED
 }
 
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  EVALUATED
+  REJECTED
+}
+
 enum ModuleState {
   INACTIVE
   DRAFT
@@ -148,6 +156,7 @@ model User {
   createdOrgs     Organization[]       @relation("OrgOwner")
   registrations   Registration[]
   teamMemberships TeamMember[]
+  submissions     Submission[]
 
   @@map("users")
 }
@@ -275,6 +284,7 @@ model Module {
 
   teams         Team[]
   registrations Registration[]
+  submissions   Submission[]
 
   @@unique([eventId, slug])
   @@map("modules")
@@ -293,7 +303,8 @@ model Team {
 
   module       Module       @relation(fields: [moduleId], references: [id])
   members      TeamMember[]
-  registration Registration? 
+  registration Registration?
+  submissions  Submission[] 
 
   @@unique([moduleId, name])
   @@map("teams")
@@ -328,4 +339,26 @@ model Registration {
 
   @@unique([moduleId, userId])
   @@map("registrations")
+}
+
+model Submission {
+  id           String           @id @default(uuid())
+  moduleId     String
+  userId       String?
+  teamId       String?
+  status       SubmissionStatus @default(SUBMITTED)
+  contentJsonb Json             @default("{}")
+  score        Float?
+  feedback     String?
+  submittedAt  DateTime         @default(now())
+  evaluatedAt  DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  module Module @relation(fields: [moduleId], references: [id])
+  user   User?  @relation(fields: [userId], references: [id])
+  team   Team?  @relation(fields: [teamId], references: [id])
+
+  @@unique([moduleId, userId])  // One submission per user per module (for individual)
+  @@map("submissions")
 }

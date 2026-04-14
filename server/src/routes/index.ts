@@ -14,6 +14,7 @@ import eventRoutes        from "@modules/event/event.routes";
 import moduleRoutes       from "@modules/module/core/module.routes";
 import registrationRoutes from "@modules/registration/registration.routes";
 import teamRoutes         from "@modules/team/team.routes";
+import submissionRoutes   from "@modules/submission/submission.routes";
 
 const router = Router();
 
@@ -33,5 +34,6 @@ router.use("/events",        eventRoutes);
 router.use("/modules",       moduleRoutes);
 router.use("/registrations", registrationRoutes);
 router.use("/teams",         teamRoutes);
+router.use("/submissions",   submissionRoutes);
 
 export default router;
