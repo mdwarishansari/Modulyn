@@ -16,5 +16,6 @@ router.get("/event/:eventId", optionalAuth, moduleCoreController.getEventModules
 // ─── Protected ──────────────────────────────────────────────────────────
 router.post("/", requireAuth, moduleCoreController.createModule);
 router.patch("/:moduleId/state", requireAuth, moduleCoreController.transitionModuleState);
+router.post("/:moduleId/publish-results", requireAuth, moduleCoreController.publishResults);
 
 export default router;

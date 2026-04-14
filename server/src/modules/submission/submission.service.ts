@@ -103,13 +103,27 @@ export class SubmissionService {
    * Triggers evaluate() hook on a specific submission.
    * Used by judges/admins post-LIVE.
    */
-  async evaluateSubmission(submissionId: string) {
+  async evaluateSubmission(submissionId: string, evaluatorId: string) {
     const submission = await prisma.submission.findUnique({
       where: { id: submissionId },
       include: { module: true },
     });
 
     if (!submission) throw new Error("Submission not found");
+
+    if (submission.module.resultPublished) {
+       throw new Error("Module results are published. Evaluation is locked.");
+    }
+
+    if (submission.status === "EVALUATED") {
+       throw new Error("Submission is already evaluated. Re-evaluation must be explicitly reset first.");
+    }
+
+    // Move to UNDER_REVIEW automatically before calling evaluate hook (optional, depending on architecture, but good for tracking)
+    await prisma.submission.update({
+      where: { id: submissionId },
+      data: { status: "UNDER_REVIEW" }
+    });
 
     const handler = resolveHandler(submission.module.type);
 
@@ -125,6 +139,7 @@ export class SubmissionService {
         score: result.score,
         feedback: result.feedback ?? null,
         status: "EVALUATED",
+        evaluatorId: evaluatorId,
         evaluatedAt: new Date(),
       },
     });

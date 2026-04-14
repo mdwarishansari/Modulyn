@@ -49,6 +49,6 @@ export const getMySubmission = asyncHandler(async (req: Request, res: Response) 
 
 export const evaluateSubmission = asyncHandler(async (req: Request, res: Response) => {
   const { submissionId } = req.params;
-  const result = await submissionService.evaluateSubmission(submissionId as string);
+  const result = await submissionService.evaluateSubmission(submissionId as string, req.user!.id);
   res.status(200).json({ success: true, data: result });
 });
