@@ -15,6 +15,7 @@ import moduleRoutes       from "@modules/module/core/module.routes";
 import registrationRoutes from "@modules/registration/registration.routes";
 import teamRoutes         from "@modules/team/team.routes";
 import submissionRoutes   from "@modules/submission/submission.routes";
+import leaderboardRoutes  from "@modules/leaderboard/leaderboard.routes";
 
 const router = Router();
 
@@ -35,5 +36,6 @@ router.use("/modules",       moduleRoutes);
 router.use("/registrations", registrationRoutes);
 router.use("/teams",         teamRoutes);
 router.use("/submissions",   submissionRoutes);
+router.use("/leaderboard",   leaderboardRoutes);
 
 export default router;

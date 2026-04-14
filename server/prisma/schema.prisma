@@ -274,6 +274,7 @@ model Module {
   rulesJsonb    Json @default("{}")
 
   orderIndex Int      @default(0)
+  resultPublished Boolean  @default(false)  // Locks leaderboard and prevents further evaluation
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -350,6 +351,7 @@ model Submission {
   contentJsonb Json             @default("{}")
   score        Float?
   feedback     String?
+  evaluatorId  String?          // User who evaluated (judge/admin)
   submittedAt  DateTime         @default(now())
   evaluatedAt  DateTime?
   createdAt    DateTime         @default(now())
