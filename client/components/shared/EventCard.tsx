@@ -21,7 +21,11 @@ export const EventCard = React.memo(function EventCard({ event, className }: Eve
   const href = `/e/${event.organization.slug}/${event.slug}`;
 
   return (
-    <Link href={href} className={cn("group block rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] overflow-hidden transition-all duration-200 hover:border-[var(--border-strong)] hover:shadow-[var(--shadow-md)] hover:-translate-y-0.5", className)}>
+    <Link href={href} className={cn(
+      "group block rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] overflow-hidden",
+      "transition-all duration-200 hover:border-[var(--border-strong)] hover:shadow-[var(--shadow-sm)] hover:-translate-y-px",
+      className
+    )}>
       {/* Banner */}
       <div className="relative h-40 w-full bg-[var(--bg-muted)] overflow-hidden">
         {event.bannerUrl ? (
