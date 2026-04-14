@@ -204,9 +204,11 @@ export type SubmissionPayload =
 export interface Submission {
   id: string;
   moduleId: string;
-  module?: Pick<Module, "id" | "title" | "type">;
+  module?: Pick<Module, "id" | "title" | "type"> & { event?: Pick<Event, "slug" | "title"> & { organization: { name: string; slug: string } } };
   userId: string;
+  user?: { id: string; name: string | null; avatarUrl: string | null };
   teamId: string | null;
+  team?: { id: string; name: string };
   payload: SubmissionPayload;
   status: SubmissionStatus;
   score: number | null;
@@ -241,7 +243,9 @@ export interface Notification {
   type: NotificationType;
   title: string;
   body: string;
+  message?: string; // Deprecated/Alias for body
   isRead: boolean;
+  read?: boolean; // UI alias
   link: string | null;
   createdAt: string;
 }

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { Metadata } from "next";
 import { useEvents } from "@/hooks/useEvents";
 import { EventCard } from "@/components/shared/EventCard";
 import { EventCardSkeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/shared/EmptyState";
+import { FetchError } from "@/components/ui/FetchError";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Input } from "@/components/ui/Input";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -24,7 +24,7 @@ const STATE_FILTERS: { label: string; value: EventState | "ALL" }[] = [
 ];
 
 export default function EventsPage() {
-  const { events, isLoading } = useEvents();
+  const { events, isLoading, error, refetch } = useEvents();
   const [search, setSearch]     = useState("");
   const [stateFilter, setStateFilter] = useState<EventState | "ALL">("ALL");
   const debouncedSearch = useDebounce(search, 250);
@@ -79,7 +79,13 @@ export default function EventsPage() {
       </div>
 
       {/* Grid */}
-      {isLoading ? (
+      {error ? (
+        <FetchError
+          title="Failed to load events"
+          message={error.message ?? "Could not connect to the server."}
+          onRetry={refetch}
+        />
+      ) : isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => <EventCardSkeleton key={i} />)}
         </div>

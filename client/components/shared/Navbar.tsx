@@ -27,9 +27,9 @@ function NavLink({ href, label }: { href: string; label: string }) {
     <Link
       href={href}
       className={cn(
-        "text-sm font-medium px-3 py-1.5 rounded-[var(--radius-md)] transition-all duration-200",
+        "text-sm px-3 py-1.5 rounded-[var(--radius-md)] transition-all duration-200 font-medium",
         isActive
-          ? "text-[var(--accent-500)] bg-[var(--accent-50)]"
+          ? "text-[var(--accent-500)]"
           : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
       )}
     >
@@ -68,12 +68,21 @@ export function Navbar() {
         <Logo size="sm" />
 
         {/* Center: Desktop nav links */}
-        <nav className="hidden sm:flex items-center gap-1" aria-label="Primary navigation">
+        <nav className="hidden sm:flex items-center gap-0.5" aria-label="Primary navigation">
           {NAV_LINKS.map((l) => <NavLink key={l.href} {...l} />)}
         </nav>
 
         {/* Right: theme + bell + auth + hamburger */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          <Show when="signed-in">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-[var(--accent-500)] hover:text-[var(--accent-600)] hidden sm:flex px-2 py-1.5 transition-colors"
+            >
+              Dashboard
+            </Link>
+          </Show>
+
           <ThemeToggle />
 
           <Show when="signed-in">
