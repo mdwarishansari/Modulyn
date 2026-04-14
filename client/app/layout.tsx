@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
-import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
+import { ClerkProvider, Show } from "@clerk/nextjs";
 import Script from "next/script";
+import { AuthButtons } from "@/components/auth/AuthButtons";
+import { UserMenu } from "@/components/auth/UserMenu";
 import "./globals.css";
 
 const inter = Inter({
@@ -80,11 +82,10 @@ export default function RootLayout({
             </span>
             <div className="flex items-center gap-3">
               <Show when="signed-out">
-                <SignInButton mode="modal" />
-                <SignUpButton mode="modal" />
+                <AuthButtons />
               </Show>
               <Show when="signed-in">
-                <UserButton />
+                <UserMenu />
               </Show>
             </div>
           </header>

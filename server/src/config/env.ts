@@ -4,8 +4,20 @@
  */
 
 import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
 
-dotenv.config();
+// Prefer .env.local for local development testing overrides
+const envLocalPath = path.resolve(process.cwd(), ".env.local");
+const envPath = path.resolve(process.cwd(), ".env");
+
+if (fs.existsSync(envLocalPath)) {
+  dotenv.config({ path: envLocalPath });
+  console.log(`[Config] Initialized using .env.local`);
+} else {
+  dotenv.config({ path: envPath });
+  console.log(`[Config] Initialized using .env`);
+}
 
 function required(key: string): string {
   const value = process.env[key];
