@@ -1,0 +1,262 @@
+// server/prisma/schema.prisma
+// Initial Prisma schema for Modulyn.
+// Core entities are defined here. Business logic fields will be added per module.
+// Run: npx prisma db push  (to sync with NeonDB without migrations)
+// Run: npx prisma migrate dev (to create tracked migrations)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  DELETED
+}
+
+enum OrgType {
+  COLLEGE
+  CLUB
+  COMPANY
+  COMMUNITY
+  PERSONAL
+}
+
+enum OrgStatus {
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+enum OrgMemberRole {
+  OWNER
+  ADMIN
+  MODERATOR
+  EDITOR
+  VIEWER
+}
+
+enum OrgMemberStatus {
+  INVITED
+  ACTIVE
+  REMOVED
+}
+
+enum EventVisibility {
+  PUBLIC
+  PRIVATE
+  INVITE_ONLY
+  CODE_PROTECTED
+}
+
+enum EventState {
+  DRAFT
+  PUBLISHED
+  REGISTRATION_OPEN
+  REGISTRATION_CLOSED
+  LIVE
+  FINISHED
+  ARCHIVED
+}
+
+enum LocationType {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
+enum EventMemberRole {
+  EVENT_OWNER
+  EVENT_ADMIN
+  MANAGER
+  JUDGE
+  VOLUNTEER
+  SUPPORT
+}
+
+enum EventMemberStatus {
+  INVITED
+  ACTIVE
+  REVOKED
+}
+
+enum ModuleType {
+  QUIZ
+  CODING
+  HACKATHON
+  POSTER
+  UIUX
+  VOTING
+  PRESENTATION
+  CUSTOM
+}
+
+enum ModuleMode {
+  INDIVIDUAL
+  TEAM
+  HYBRID
+}
+
+enum ModuleState {
+  INACTIVE
+  DRAFT
+  REGISTRATION_OPEN
+  REGISTRATION_CLOSED
+  LIVE
+  FINISHED
+  ARCHIVED
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id          String     @id @default(uuid())
+  email       String     @unique
+  name        String
+  username    String?    @unique
+  avatarUrl   String?
+  phone       String?
+  status      UserStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  orgMemberships  OrganizationMember[]
+  eventMemberships EventMember[]
+  createdEvents   Event[]
+  createdModules  Module[]
+  createdOrgs     Organization[]       @relation("OrgOwner")
+
+  @@map("users")
+}
+
+model Organization {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  type        OrgType
+  logoUrl     String?
+  description String?
+  status      OrgStatus @default(ACTIVE)
+  ownerId     String
+  owner       User      @relation("OrgOwner", fields: [ownerId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  members OrganizationMember[]
+  events  Event[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String          @id @default(uuid())
+  organizationId String
+  userId         String
+  role           OrgMemberRole
+  status         OrgMemberStatus @default(INVITED)
+  joinedAt       DateTime        @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+model Event {
+  id                   String          @id @default(uuid())
+  organizationId       String
+  createdById          String
+  title                String
+  slug                 String
+  description          String
+  shortDescription     String?
+  bannerUrl            String?
+  posterUrl            String?
+  visibility           EventVisibility @default(PUBLIC)
+  state                EventState      @default(DRAFT)
+  timezone             String          @default("Asia/Kolkata")
+  startsAt             DateTime?
+  endsAt               DateTime?
+  registrationOpensAt  DateTime?
+  registrationClosesAt DateTime?
+  accessCodeHash       String?
+  locationType         LocationType    @default(ONLINE)
+  locationText         String?
+  featured             Boolean         @default(false)
+  seoTitle             String?
+  seoDescription       String?
+  publishedAt          DateTime?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  createdBy    User          @relation(fields: [createdById], references: [id])
+  members      EventMember[]
+  modules      Module[]
+
+  @@unique([organizationId, slug])
+  @@map("events")
+}
+
+model EventMember {
+  id        String            @id @default(uuid())
+  eventId   String
+  userId    String
+  role      EventMemberRole
+  status    EventMemberStatus @default(INVITED)
+  createdAt DateTime          @default(now())
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+  @@map("event_members")
+}
+
+model Module {
+  id                   String      @id @default(uuid())
+  eventId              String
+  parentModuleId       String?
+  createdById          String
+  title                String
+  slug                 String
+  type                 ModuleType
+  description          String
+  moduleMode           ModuleMode  @default(INDIVIDUAL)
+  state                ModuleState @default(INACTIVE)
+  visibility           EventVisibility @default(PUBLIC)
+  registrationRequired Boolean     @default(true)
+  approvalRequired     Boolean     @default(false)
+  maxParticipants      Int?
+  maxTeams             Int?
+  teamSizeMin          Int?
+  teamSizeMax          Int?
+  startsAt             DateTime?
+  endsAt               DateTime?
+
+  // JSONB fields for flexible, module-type-specific configuration
+  // e.g. quiz time limits, coding allowed languages, hackathon themes
+  configJsonb   Json @default("{}")
+  scoringJsonb  Json @default("{}")
+  rulesJsonb    Json @default("{}")
+
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  event        Event   @relation(fields: [eventId], references: [id])
+  createdBy    User    @relation(fields: [createdById], references: [id])
+  parentModule Module? @relation("ModuleHierarchy", fields: [parentModuleId], references: [id])
+  subModules   Module[] @relation("ModuleHierarchy")
+
+  @@unique([eventId, slug])
+  @@map("modules")
+}
