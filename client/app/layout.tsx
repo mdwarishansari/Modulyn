@@ -1,13 +1,7 @@
-/**
- * client/app/layout.tsx
- * Root layout — registers fonts, wires theme class, sets global metadata.
- * Theme toggle is handled by useTheme hook; the "dark" class is applied to <html>.
- */
-
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-import { Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({
@@ -37,8 +31,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     title: "Modulyn — Modular Event Platform",
-    description:
-      "Run complete events from one system. Quiz, hackathon, coding, and more.",
+    description: "Run complete events from one system. Quiz, hackathon, coding, and more.",
     siteName: "Modulyn",
   },
 };
@@ -46,7 +39,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c0c10" },
+    { media: "(prefers-color-scheme: dark)",  color: "#0c0c10"  },
   ],
   width: "device-width",
   initialScale: 1,
@@ -61,39 +54,39 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${inter.variable} ${geistMono.variable}`}
     >
-      {/*
-        suppressHydrationWarning is required because the theme class ("dark")
-        is injected by a script before React hydrates, which would otherwise
-        cause a hydration mismatch warning.
-      */}
       <head>
-        {/* Inline theme init script — prevents flash of wrong theme */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('modulyn_theme');
-                  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  if (theme === 'dark' || (!theme && prefersDark)) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch(e) {}
-              })();
-            `,
-          }}
-        />
+        {/*
+          Theme init via next/script with strategy="beforeInteractive" so it runs
+          before React hydrates and prevents flash of wrong theme.
+          Using next/script instead of raw <script> silences the React warning.
+        */}
+        <Script id="theme-init" strategy="beforeInteractive">{`
+          (function() {
+            try {
+              var theme = localStorage.getItem('modulyn_theme');
+              var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+              if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+              }
+            } catch(e) {}
+          })();
+        `}</Script>
       </head>
       <body className="min-h-dvh flex flex-col bg-[var(--bg-base)] text-[var(--text-primary)] antialiased">
         <ClerkProvider>
-          <header className="flex justify-end p-4 gap-4 border-b border-[var(--border-subtle)]">
-            <Show when="signed-out">
-              <SignInButton />
-              <SignUpButton />
-            </Show>
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
+          <header className="flex items-center justify-between px-6 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-card)]">
+            <span className="font-semibold text-[var(--text-primary)] tracking-tight">
+              Modulyn
+            </span>
+            <div className="flex items-center gap-3">
+              <Show when="signed-out">
+                <SignInButton mode="modal" />
+                <SignUpButton mode="modal" />
+              </Show>
+              <Show when="signed-in">
+                <UserButton />
+              </Show>
+            </div>
           </header>
           {children}
         </ClerkProvider>

@@ -44,7 +44,7 @@ export async function sendEmail({ to, subject, html, text, replyTo }: SendEmailO
       subject,
       html,
       text: text || "",
-      reply_to: replyTo,
+      replyTo: replyTo,
     });
 
     if (error) throw new Error(`[Resend Error]: ${error.message}`);

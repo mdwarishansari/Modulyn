@@ -1,6 +1,6 @@
 /**
  * server/src/middlewares/auth/optionalAuth.ts
- * Validates the Clerk session if passed, otherwise continues anonymously.
+ * Validates the Clerk session if present, continues anonymously otherwise.
  */
 
 import { Request, Response, NextFunction } from "express";
@@ -10,36 +10,28 @@ import { env } from "@config/env";
 
 export const optionalAuth = [
   clerkMiddleware(),
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
       const auth = getAuth(req);
-      
-      if (auth && auth.userId) {
+
+      if (auth?.userId) {
         const dbUser = await prisma.user.findUnique({
-          where: { id: auth.userId }
+          where: { id: auth.userId },
         });
 
         if (dbUser) {
-          let isSuperAdmin = false;
-          if (
-            (env.SUPER_ADMIN_EMAIL && dbUser.email === env.SUPER_ADMIN_EMAIL) ||
-            (env.SUPER_ADMIN_ALLOWED_DOMAINS && dbUser.email.endsWith(`@${env.SUPER_ADMIN_ALLOWED_DOMAINS}`))
-          ) {
-            isSuperAdmin = true;
-          }
+          const isSuperAdmin =
+            (!!env.SUPER_ADMIN_EMAIL && dbUser.email === env.SUPER_ADMIN_EMAIL) ||
+            (!!env.SUPER_ADMIN_ALLOWED_DOMAINS &&
+              dbUser.email.endsWith(`@${env.SUPER_ADMIN_ALLOWED_DOMAINS}`));
 
-          req.user = {
-            id: dbUser.id,
-            email: dbUser.email,
-            isSuperAdmin,
-          };
+          req.user = { id: dbUser.id, email: dbUser.email, isSuperAdmin };
         }
       }
       next();
     } catch (error) {
-      // Continue anonymously on error
       console.error("[optionalAuth] Error:", error);
-      next();
+      next(); // Continue anonymously on error
     }
-  }
+  },
 ];
