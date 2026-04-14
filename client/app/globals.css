@@ -1,26 +1,235 @@
+/*
+ * client/app/globals.css
+ *
+ * Modulyn Design System
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Stack: Tailwind CSS v4 (CSS-first config via @theme)
+ * Theme: class-based dark mode (.dark on <html>)
+ *
+ * Token structure:
+ *   --color-*   → Tailwind color palette tokens
+ *   --radius-*  → Border radius scale
+ *   --font-*    → Typography tokens
+ *   --shadow-*  → Elevation tokens
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
 @import "tailwindcss";
 
+/* ─── Light Mode Tokens (default) ────────────────────────────────────────────*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background */
+  --bg-base:        #ffffff;
+  --bg-subtle:      #f4f4f6;
+  --bg-muted:       #e8e8ed;
+  --bg-card:        #ffffff;
+  --bg-card-hover:  #f8f8fb;
+  --bg-overlay:     rgba(0, 0, 0, 0.4);
+
+  /* Border */
+  --border-default: #e2e2e9;
+  --border-subtle:  #ebebf0;
+  --border-strong:  #c8c8d2;
+
+  /* Text */
+  --text-primary:   #0f0f14;
+  --text-secondary: #52525f;
+  --text-muted:     #8383929;
+  --text-disabled:  #afafba;
+  --text-inverse:   #ffffff;
+
+  /* Accent — Indigo/Violet (consistent across light + dark) */
+  --accent-50:      #eef2ff;
+  --accent-100:     #e0e7ff;
+  --accent-200:     #c7d2fe;
+  --accent-300:     #a5b4fc;
+  --accent-400:     #818cf8;
+  --accent-500:     #6366f1;   /* primary accent */
+  --accent-600:     #4f46e5;   /* hover */
+  --accent-700:     #4338ca;   /* active/pressed */
+  --accent-800:     #3730a3;
+  --accent-900:     #312e81;
+
+  /* Status colors */
+  --status-success:   #16a34a;
+  --status-warning:   #d97706;
+  --status-error:     #dc2626;
+  --status-info:      #2563eb;
+
+  /* Event/Module state badge colors */
+  --state-draft:        #8b8fa8;
+  --state-published:    #2563eb;
+  --state-reg-open:     #16a34a;
+  --state-reg-closed:   #d97706;
+  --state-live:         #dc2626;
+  --state-finished:     #6366f1;
+  --state-archived:     #64748b;
+
+  /* Surface shadow */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.10);
+  --shadow-xl:   0 16px 40px rgba(0, 0, 0, 0.12);
 }
 
+/* ─── Dark Mode Tokens ────────────────────────────────────────────────────────*/
+.dark {
+  /* Background */
+  --bg-base:        #0c0c10;
+  --bg-subtle:      #13131a;
+  --bg-muted:       #1c1c26;
+  --bg-card:        #16161f;
+  --bg-card-hover:  #1e1e2a;
+  --bg-overlay:     rgba(0, 0, 0, 0.65);
+
+  /* Border */
+  --border-default: #26263a;
+  --border-subtle:  #1e1e2e;
+  --border-strong:  #36364f;
+
+  /* Text */
+  --text-primary:   #f0f0f8;
+  --text-secondary: #9393aa;
+  --text-muted:     #5e5e72;
+  --text-disabled:  #3a3a4c;
+  --text-inverse:   #0c0c10;
+
+  /* Status colors (slightly brighter for dark bg readability) */
+  --status-success:   #22c55e;
+  --status-warning:   #f59e0b;
+  --status-error:     #ef4444;
+  --status-info:      #3b82f6;
+
+  /* Event/Module state badge colors (dark) */
+  --state-draft:        #6b7280;
+  --state-published:    #3b82f6;
+  --state-reg-open:     #22c55e;
+  --state-reg-closed:   #f59e0b;
+  --state-live:         #ef4444;
+  --state-finished:     #818cf8;
+  --state-archived:     #94a3b8;
+
+  /* Shadow (less visible on dark) */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl:   0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* ─── Tailwind v4 Theme Registration ─────────────────────────────────────────*/
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Map CSS vars → Tailwind utility tokens */
+
+  --color-bg-base:       var(--bg-base);
+  --color-bg-subtle:     var(--bg-subtle);
+  --color-bg-muted:      var(--bg-muted);
+  --color-bg-card:       var(--bg-card);
+  --color-bg-card-hover: var(--bg-card-hover);
+
+  --color-border:        var(--border-default);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+
+  --color-text:          var(--text-primary);
+  --color-text-muted:    var(--text-secondary);
+  --color-text-dim:      var(--text-muted);
+
+  --color-accent:        var(--accent-500);
+  --color-accent-hover:  var(--accent-600);
+  --color-accent-light:  var(--accent-100);
+
+  --color-success:       var(--status-success);
+  --color-warning:       var(--status-warning);
+  --color-error:         var(--status-error);
+  --color-info:          var(--status-info);
+
+  /* Typography */
+  --font-sans:  var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:  var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Radius */
+  --radius-sm:  0.375rem;   /* 6px  */
+  --radius-md:  0.625rem;   /* 10px */
+  --radius-lg:  0.875rem;   /* 14px */
+  --radius-xl:  1.25rem;    /* 20px */
+  --radius-full: 9999px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base Styles ─────────────────────────────────────────────────────────────*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-color: var(--border-default);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  min-height: 100dvh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ─── Typography ──────────────────────────────────────────────────────────────*/
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+p {
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--accent-500);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--accent-600);
+}
+
+/* ─── Focus Ring ──────────────────────────────────────────────────────────────*/
+:focus-visible {
+  outline: 2px solid var(--accent-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Scrollbar (subtle) ──────────────────────────────────────────────────────*/
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ─── Selection ───────────────────────────────────────────────────────────────*/
+::selection {
+  background-color: var(--accent-200);
+  color: var(--accent-900);
+}
+.dark ::selection {
+  background-color: var(--accent-700);
+  color: var(--text-inverse);
 }
