@@ -21,18 +21,18 @@ router.get("/health", (_req: Request, res: Response) => {
 });
 
 // ─── Future Module Routes ──────────────────────────────────────────────────────
-// import authRoutes from "@modules/auth/auth.routes";
-// import userRoutes from "@modules/user/user.routes";
-// import orgRoutes from "@modules/organization/organization.routes";
-// import eventRoutes from "@modules/event/event.routes";
-// import moduleRoutes from "@modules/module/module.routes";
-// import registrationRoutes from "@modules/registration/registration.routes";
+import authRoutes from "@modules/auth/auth.routes";
+import userRoutes from "@modules/user/user.routes";
+import orgRoutes from "@modules/organization/organization.routes";
+import eventRoutes from "@modules/event/event.routes";
+import moduleRoutes from "@modules/module/module.routes";
+import registrationRoutes from "@modules/registration/registration.routes";
 
-// router.use("/auth", authRoutes);
-// router.use("/users", userRoutes);
-// router.use("/organizations", orgRoutes);
-// router.use("/events", eventRoutes);
-// router.use("/modules", moduleRoutes);
-// router.use("/registrations", registrationRoutes);
+router.use("/auth", authRoutes);
+router.use("/users", userRoutes);
+router.use("/organizations", orgRoutes);
+router.use("/events", eventRoutes);
+router.use("/modules", moduleRoutes);
+router.use("/registrations", registrationRoutes);
 
 export default router;
