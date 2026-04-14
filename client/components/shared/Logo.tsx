@@ -1,66 +1,105 @@
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * client/components/shared/Logo.tsx
- * Modulyn wordmark logo. Renders as a <Link> to "/" by default.
- * Pass `asSpan` to render the mark without a link (e.g. in auth pages).
+ * components/shared/Logo.tsx
+ * Modulyn brand logo — uses /public/logo.png with text fallback.
+ *
+ * Modes:
+ *   - Default: renders as <Link href="/">
+ *   - asSpan:  renders as <span> (e.g. auth pages, splash screen)
+ *
+ * Sizes:
+ *   - sm: h-6  (24px)
+ *   - md: h-8  (32px)   ← default
+ *   - lg: h-10 (40px)
+ *   - xl: h-12 (48px)
  */
 
+type LogoSize = "sm" | "md" | "lg" | "xl";
+
 interface LogoProps {
-  size?: "sm" | "md" | "lg";
-  asSpan?: boolean;
+  size?:      LogoSize;
+  asSpan?:    boolean;
+  showText?:  boolean;   // show wordmark next to logo image
   className?: string;
 }
 
-const sizeMap = {
-  sm: { text: "text-base", dot: "w-2 h-2" },
-  md: { text: "text-xl",   dot: "w-2.5 h-2.5" },
-  lg: { text: "text-3xl",  dot: "w-3 h-3" },
+const sizeConfig: Record<LogoSize, { h: number; w: number; text: string }> = {
+  sm: { h: 24,  w: 24,  text: "text-base" },
+  md: { h: 32,  w: 32,  text: "text-xl"   },
+  lg: { h: 40,  w: 40,  text: "text-2xl"  },
+  xl: { h: 48,  w: 48,  text: "text-3xl"  },
 };
 
-function LogoMark({ size = "md", className }: Omit<LogoProps, "asSpan">) {
-  const s = sizeMap[size];
+function LogoMark({ size = "md", showText = true, className }: Omit<LogoProps, "asSpan">) {
+  const cfg = sizeConfig[size];
+
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 font-semibold tracking-tight select-none",
-        s.text,
+        "inline-flex items-center gap-2 select-none",
         className
       )}
       aria-label="Modulyn"
     >
-      <span className="text-[var(--text-primary)]">Modulyn</span>
-      {/* Accent dot — represents the "module" identity */}
-      <span
-        className={cn(
-          "rounded-full bg-[var(--accent-500)] shrink-0 mb-[0.1em]",
-          s.dot
-        )}
-        aria-hidden="true"
-      />
+      {/* Logo image with text fallback */}
+      <span className="relative shrink-0 flex items-center justify-center">
+        <Image
+          src="/logo.png"
+          alt="Modulyn logo"
+          width={cfg.w}
+          height={cfg.h}
+          className="object-contain"
+          priority
+          onError={(e) => {
+            // Hide broken image — fallback dot renders below
+            (e.target as HTMLImageElement).style.display = "none";
+          }}
+        />
+        {/* Fallback accent dot (shown if logo.png fails to load) */}
+        <span
+          aria-hidden="true"
+          className="hidden fallback:block w-2 h-2 rounded-full bg-[var(--accent-500)]"
+        />
+      </span>
+
+      {/* Wordmark */}
+      {showText && (
+        <span
+          className={cn(
+            "font-semibold tracking-tight text-[var(--text-primary)]",
+            cfg.text
+          )}
+        >
+          Modulyn
+        </span>
+      )}
     </span>
   );
 }
 
-export function Logo({ size = "md", asSpan = false, className }: LogoProps) {
+export function Logo({ size = "md", asSpan = false, showText = true, className }: LogoProps) {
   if (asSpan) {
-    return <LogoMark size={size} className={className} />;
+    return <LogoMark size={size} showText={showText} className={className} />;
   }
 
   return (
     <Link
       href="/"
       className={cn(
-        "inline-flex items-center focus-visible:outline-none",
-        "focus-visible:ring-2 focus-visible:ring-[var(--accent-500)]",
-        "focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]",
+        "inline-flex items-center",
         "rounded-[var(--radius-sm)]",
+        "focus-visible:outline-none focus-visible:ring-2",
+        "focus-visible:ring-[var(--accent-500)] focus-visible:ring-offset-2",
+        "focus-visible:ring-offset-[var(--bg-base)]",
+        "transition-opacity duration-150 hover:opacity-80",
         className
       )}
     >
-      <LogoMark size={size} />
+      <LogoMark size={size} showText={showText} />
     </Link>
   );
 }

@@ -1,62 +1,77 @@
 /*
  * client/app/globals.css
  *
- * Modulyn Design System
+ * Modulyn Design System — v2
  * ─────────────────────────────────────────────────────────────────────────────
- * Stack: Tailwind CSS v4 (CSS-first config via @theme)
- * Theme: class-based dark mode (.dark on <html>)
+ * Stack:  Tailwind CSS v4 (CSS-first config via @theme inline)
+ * Theme:  Class-based dark mode (.dark on <html>)
  *
- * Token structure:
- *   --color-*   → Tailwind color palette tokens
- *   --radius-*  → Border radius scale
- *   --font-*    → Typography tokens
- *   --shadow-*  → Elevation tokens
+ * Token layers:
+ *   1. Color tokens     → --bg-* --text-* --border-* --accent-* --state-* --status-*
+ *   2. Spacing scale    → --space-*
+ *   3. Radius scale     → --radius-*
+ *   4. Shadow system    → --shadow-*
+ *   5. Z-index system   → --z-*
+ *   6. Typography       → --font-* --leading-* --tracking-*
+ *
+ * Rule: NO raw colors in components. Always use a CSS var or a @theme token.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
 @import "tailwindcss";
 
-/* ─── Light Mode Tokens (default) ────────────────────────────────────────────*/
+/* ─────────────────────────────────────────────────────────────────────────────
+   LIGHT MODE TOKENS (default / :root)
+   ───────────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Background */
+
+  /* ── Backgrounds ─────────────────────────────────────────── */
   --bg-base:        #ffffff;
   --bg-subtle:      #f4f4f6;
   --bg-muted:       #e8e8ed;
   --bg-card:        #ffffff;
   --bg-card-hover:  #f8f8fb;
-  --bg-overlay:     rgba(0, 0, 0, 0.4);
+  --bg-overlay:     rgba(0, 0, 0, 0.40);
+  --bg-input:       #ffffff;
 
-  /* Border */
+  /* ── Borders ─────────────────────────────────────────────── */
   --border-default: #e2e2e9;
   --border-subtle:  #ebebf0;
   --border-strong:  #c8c8d2;
+  --border-focus:   var(--accent-500);
 
-  /* Text */
+  /* ── Text ────────────────────────────────────────────────── */
   --text-primary:   #0f0f14;
   --text-secondary: #52525f;
-  --text-muted:     #8383929;
+  --text-muted:     #83839a;
   --text-disabled:  #afafba;
   --text-inverse:   #ffffff;
+  --text-on-accent: #ffffff;
 
-  /* Accent — Indigo/Violet (consistent across light + dark) */
-  --accent-50:      #eef2ff;
-  --accent-100:     #e0e7ff;
-  --accent-200:     #c7d2fe;
-  --accent-300:     #a5b4fc;
-  --accent-400:     #818cf8;
-  --accent-500:     #6366f1;   /* primary accent */
-  --accent-600:     #4f46e5;   /* hover */
-  --accent-700:     #4338ca;   /* active/pressed */
-  --accent-800:     #3730a3;
-  --accent-900:     #312e81;
+  /* ── Accent — Indigo (same in both themes for brand consistency) ── */
+  --accent-50:   #eef2ff;
+  --accent-100:  #e0e7ff;
+  --accent-200:  #c7d2fe;
+  --accent-300:  #a5b4fc;
+  --accent-400:  #818cf8;
+  --accent-500:  #6366f1;   /* ← primary brand accent */
+  --accent-600:  #4f46e5;   /* hover */
+  --accent-700:  #4338ca;   /* active / pressed */
+  --accent-800:  #3730a3;
+  --accent-900:  #312e81;
 
-  /* Status colors */
+  /* ── Status ──────────────────────────────────────────────── */
   --status-success:   #16a34a;
   --status-warning:   #d97706;
   --status-error:     #dc2626;
   --status-info:      #2563eb;
 
-  /* Event/Module state badge colors */
+  --status-success-bg: #f0fdf4;
+  --status-warning-bg: #fffbeb;
+  --status-error-bg:   #fef2f2;
+  --status-info-bg:    #eff6ff;
+
+  /* ── Event / Module lifecycle state colors ───────────────── */
   --state-draft:        #8b8fa8;
   --state-published:    #2563eb;
   --state-reg-open:     #16a34a;
@@ -64,43 +79,57 @@
   --state-live:         #dc2626;
   --state-finished:     #6366f1;
   --state-archived:     #64748b;
+  --state-inactive:     #94a3b8;
 
-  /* Surface shadow */
-  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.10);
-  --shadow-xl:   0 16px 40px rgba(0, 0, 0, 0.12);
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10), 0 4px 8px rgba(0, 0, 0, 0.06);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
+  --shadow-accent: 0 4px 20px rgba(99, 102, 241, 0.25);
 }
 
-/* ─── Dark Mode Tokens ────────────────────────────────────────────────────────*/
+/* ─────────────────────────────────────────────────────────────────────────────
+   DARK MODE TOKENS (.dark class on <html>)
+   ───────────────────────────────────────────────────────────────────────────── */
 .dark {
-  /* Background */
+
+  /* ── Backgrounds ─────────────────────────────────────────── */
   --bg-base:        #0c0c10;
   --bg-subtle:      #13131a;
   --bg-muted:       #1c1c26;
   --bg-card:        #16161f;
   --bg-card-hover:  #1e1e2a;
   --bg-overlay:     rgba(0, 0, 0, 0.65);
+  --bg-input:       #13131a;
 
-  /* Border */
+  /* ── Borders ─────────────────────────────────────────────── */
   --border-default: #26263a;
   --border-subtle:  #1e1e2e;
   --border-strong:  #36364f;
+  --border-focus:   var(--accent-400);
 
-  /* Text */
+  /* ── Text ────────────────────────────────────────────────── */
   --text-primary:   #f0f0f8;
   --text-secondary: #9393aa;
   --text-muted:     #5e5e72;
   --text-disabled:  #3a3a4c;
   --text-inverse:   #0c0c10;
+  --text-on-accent: #ffffff;
 
-  /* Status colors (slightly brighter for dark bg readability) */
+  /* ── Status (brighter for dark bg readability) ───────────── */
   --status-success:   #22c55e;
   --status-warning:   #f59e0b;
   --status-error:     #ef4444;
   --status-info:      #3b82f6;
 
-  /* Event/Module state badge colors (dark) */
+  --status-success-bg: rgba(34, 197, 94, 0.10);
+  --status-warning-bg: rgba(245, 158, 11, 0.10);
+  --status-error-bg:   rgba(239, 68, 68, 0.10);
+  --status-info-bg:    rgba(59, 130, 246, 0.10);
+
+  /* ── Event / Module lifecycle state colors (dark) ─────────── */
   --state-draft:        #6b7280;
   --state-published:    #3b82f6;
   --state-reg-open:     #22c55e;
@@ -108,65 +137,217 @@
   --state-live:         #ef4444;
   --state-finished:     #818cf8;
   --state-archived:     #94a3b8;
+  --state-inactive:     #64748b;
 
-  /* Shadow (less visible on dark) */
-  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md:   0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-xl:   0 16px 40px rgba(0, 0, 0, 0.6);
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.40), 0 2px 4px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.50), 0 4px 8px rgba(0, 0, 0, 0.30);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.60), 0 8px 16px rgba(0, 0, 0, 0.40);
+  --shadow-accent: 0 4px 20px rgba(99, 102, 241, 0.35);
 }
 
-/* ─── Tailwind v4 Theme Registration ─────────────────────────────────────────*/
+/* ─────────────────────────────────────────────────────────────────────────────
+   STATIC DESIGN TOKENS (theme-independent)
+   ───────────────────────────────────────────────────────────────────────────── */
+:root {
+
+  /* ── Spacing Scale ───────────────────────────────────────── */
+  --space-0:    0px;
+  --space-px:   1px;
+  --space-0\.5: 2px;
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:    12px;
+  --space-4:    16px;
+  --space-5:    20px;
+  --space-6:    24px;
+  --space-8:    32px;
+  --space-10:   40px;
+  --space-12:   48px;
+  --space-16:   64px;
+  --space-20:   80px;
+  --space-24:   96px;
+  --space-32:   128px;
+
+  /* Semantic spacing aliases */
+  --space-xs:   var(--space-2);   /*  8px */
+  --space-sm:   var(--space-3);   /* 12px */
+  --space-md:   var(--space-4);   /* 16px */
+  --space-lg:   var(--space-6);   /* 24px */
+  --space-xl:   var(--space-8);   /* 32px */
+  --space-2xl:  var(--space-12);  /* 48px */
+  --space-3xl:  var(--space-16);  /* 64px */
+
+  /* ── Border Radius Scale ─────────────────────────────────── */
+  --radius-none: 0px;
+  --radius-xs:   0.25rem;   /*  4px */
+  --radius-sm:   0.375rem;  /*  6px */
+  --radius-md:   0.625rem;  /* 10px */
+  --radius-lg:   0.875rem;  /* 14px */
+  --radius-xl:   1.25rem;   /* 20px */
+  --radius-2xl:  1.75rem;   /* 28px */
+  --radius-full: 9999px;
+
+  /* ── Z-Index System ──────────────────────────────────────── */
+  /* Layered from lowest to highest. Never use raw numbers in components. */
+  --z-below:    -1;
+  --z-base:      0;
+  --z-raised:    10;
+  --z-dropdown:  100;
+  --z-sticky:    200;
+  --z-overlay:   300;
+  --z-modal:     400;
+  --z-popover:   500;
+  --z-toast:     600;
+  --z-tooltip:   700;
+  --z-top:       9999;
+
+  /* ── Typography ──────────────────────────────────────────── */
+  --leading-none:    1;
+  --leading-tight:   1.25;
+  --leading-snug:    1.375;
+  --leading-normal:  1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose:   2;
+
+  --tracking-tighter: -0.05em;
+  --tracking-tight:   -0.025em;
+  --tracking-normal:   0em;
+  --tracking-wide:     0.025em;
+  --tracking-wider:    0.05em;
+
+  /* ── Transitions ─────────────────────────────────────────── */
+  --duration-fast:   100ms;
+  --duration-normal: 200ms;
+  --duration-slow:   350ms;
+  --ease-default:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:         cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:        cubic-bezier(0, 0, 0.2, 1);
+  --ease-bounce:     cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Layout ──────────────────────────────────────────────── */
+  --container-xs:  480px;
+  --container-sm:  640px;
+  --container-md:  768px;
+  --container-lg:  1024px;
+  --container-xl:  1280px;
+  --container-2xl: 1440px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TAILWIND v4 THEME REGISTRATION
+   All tokens registered here become usable as Tailwind utility classes.
+   e.g. bg-bg-card, text-text-muted, shadow-md, rounded-lg, z-modal
+   ───────────────────────────────────────────────────────────────────────────── */
 @theme inline {
-  /* Map CSS vars → Tailwind utility tokens */
 
-  --color-bg-base:       var(--bg-base);
-  --color-bg-subtle:     var(--bg-subtle);
-  --color-bg-muted:      var(--bg-muted);
-  --color-bg-card:       var(--bg-card);
-  --color-bg-card-hover: var(--bg-card-hover);
+  /* Colors */
+  --color-bg-base:         var(--bg-base);
+  --color-bg-subtle:       var(--bg-subtle);
+  --color-bg-muted:        var(--bg-muted);
+  --color-bg-card:         var(--bg-card);
+  --color-bg-card-hover:   var(--bg-card-hover);
+  --color-bg-input:        var(--bg-input);
 
-  --color-border:        var(--border-default);
-  --color-border-subtle: var(--border-subtle);
-  --color-border-strong: var(--border-strong);
+  --color-border:          var(--border-default);
+  --color-border-subtle:   var(--border-subtle);
+  --color-border-strong:   var(--border-strong);
+  --color-border-focus:    var(--border-focus);
 
-  --color-text:          var(--text-primary);
-  --color-text-muted:    var(--text-secondary);
-  --color-text-dim:      var(--text-muted);
+  --color-text:            var(--text-primary);
+  --color-text-secondary:  var(--text-secondary);
+  --color-text-muted:      var(--text-muted);
+  --color-text-disabled:   var(--text-disabled);
+  --color-text-inverse:    var(--text-inverse);
+  --color-text-on-accent:  var(--text-on-accent);
 
-  --color-accent:        var(--accent-500);
-  --color-accent-hover:  var(--accent-600);
-  --color-accent-light:  var(--accent-100);
+  /* Accent palette */
+  --color-accent-50:   var(--accent-50);
+  --color-accent-100:  var(--accent-100);
+  --color-accent-200:  var(--accent-200);
+  --color-accent-300:  var(--accent-300);
+  --color-accent-400:  var(--accent-400);
+  --color-accent:      var(--accent-500);
+  --color-accent-600:  var(--accent-600);
+  --color-accent-700:  var(--accent-700);
+  --color-accent-800:  var(--accent-800);
+  --color-accent-900:  var(--accent-900);
 
-  --color-success:       var(--status-success);
-  --color-warning:       var(--status-warning);
-  --color-error:         var(--status-error);
-  --color-info:          var(--status-info);
+  /* Status */
+  --color-success:        var(--status-success);
+  --color-success-bg:     var(--status-success-bg);
+  --color-warning:        var(--status-warning);
+  --color-warning-bg:     var(--status-warning-bg);
+  --color-error:          var(--status-error);
+  --color-error-bg:       var(--status-error-bg);
+  --color-info:           var(--status-info);
+  --color-info-bg:        var(--status-info-bg);
+
+  /* State badge colors */
+  --color-state-draft:      var(--state-draft);
+  --color-state-published:  var(--state-published);
+  --color-state-reg-open:   var(--state-reg-open);
+  --color-state-reg-closed: var(--state-reg-closed);
+  --color-state-live:       var(--state-live);
+  --color-state-finished:   var(--state-finished);
+  --color-state-archived:   var(--state-archived);
+  --color-state-inactive:   var(--state-inactive);
+
+  /* Shadows */
+  --shadow-xs:     var(--shadow-xs);
+  --shadow-sm:     var(--shadow-sm);
+  --shadow-md:     var(--shadow-md);
+  --shadow-lg:     var(--shadow-lg);
+  --shadow-xl:     var(--shadow-xl);
+  --shadow-accent: var(--shadow-accent);
+
+  /* Border radius */
+  --radius-none: var(--radius-none);
+  --radius-xs:   var(--radius-xs);
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-xl:   var(--radius-xl);
+  --radius-2xl:  var(--radius-2xl);
+  --radius-full: var(--radius-full);
+
+  /* Z-index */
+  --z-below:    var(--z-below);
+  --z-base:     var(--z-base);
+  --z-raised:   var(--z-raised);
+  --z-dropdown: var(--z-dropdown);
+  --z-sticky:   var(--z-sticky);
+  --z-overlay:  var(--z-overlay);
+  --z-modal:    var(--z-modal);
+  --z-popover:  var(--z-popover);
+  --z-toast:    var(--z-toast);
+  --z-tooltip:  var(--z-tooltip);
+  --z-top:      var(--z-top);
 
   /* Typography */
   --font-sans:  var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono:  var(--font-geist-mono), ui-monospace, monospace;
-
-  /* Radius */
-  --radius-sm:  0.375rem;   /* 6px  */
-  --radius-md:  0.625rem;   /* 10px */
-  --radius-lg:  0.875rem;   /* 14px */
-  --radius-xl:  1.25rem;    /* 20px */
-  --radius-full: 9999px;
 }
 
-/* ─── Base Styles ─────────────────────────────────────────────────────────────*/
+/* ─────────────────────────────────────────────────────────────────────────────
+   BASE / RESET
+   ───────────────────────────────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
   border-color: var(--border-default);
+  margin: 0;
+  padding: 0;
 }
 
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
@@ -174,31 +355,50 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: var(--leading-relaxed);
   min-height: 100dvh;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color var(--duration-normal) var(--ease-default),
+              color var(--duration-normal) var(--ease-default);
 }
 
 /* ─── Typography ──────────────────────────────────────────────────────────────*/
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
   font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.025em;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
 }
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.875rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
 
 p {
   color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
 }
 
 a {
   color: var(--accent-500);
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition: color var(--duration-fast) var(--ease-default);
+}
+a:hover { color: var(--accent-600); }
+
+small {
+  font-size: 0.875rem;
+  color: var(--text-muted);
 }
 
-a:hover {
-  color: var(--accent-600);
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--bg-muted);
+  padding: 0.125em 0.375em;
+  border-radius: var(--radius-xs);
 }
 
 /* ─── Focus Ring ──────────────────────────────────────────────────────────────*/
@@ -208,28 +408,32 @@ a:hover {
   border-radius: var(--radius-sm);
 }
 
-/* ─── Scrollbar (subtle) ──────────────────────────────────────────────────────*/
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: var(--radius-full);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
-}
+/* ─── Scrollbar ───────────────────────────────────────────────────────────────*/
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border-strong); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 /* ─── Selection ───────────────────────────────────────────────────────────────*/
-::selection {
-  background-color: var(--accent-200);
-  color: var(--accent-900);
+::selection { background-color: var(--accent-200); color: var(--accent-900); }
+.dark ::selection { background-color: var(--accent-700); color: var(--text-inverse); }
+
+/* ─── Utilities ───────────────────────────────────────────────────────────────*/
+
+/* Visually hidden but accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
-.dark ::selection {
-  background-color: var(--accent-700);
-  color: var(--text-inverse);
+
+/* Prevent layout shift during theme transition on first load */
+.no-transition * {
+  transition: none !important;
 }
