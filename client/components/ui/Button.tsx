@@ -16,6 +16,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  asChild?: boolean;
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
@@ -89,29 +90,28 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       children,
       className,
+      asChild,
       ...props
     },
     ref
   ) => {
-    return (
-      <button
-        ref={ref}
-        disabled={disabled || isLoading}
-        className={cn(
-          // Base styles
-          "inline-flex items-center justify-center font-medium",
-          "transition-all duration-150 ease-in-out",
-          "cursor-pointer select-none whitespace-nowrap",
-          "focus-visible:outline-none focus-visible:ring-2",
-          "focus-visible:ring-[var(--accent-500)] focus-visible:ring-offset-2",
-          "focus-visible:ring-offset-[var(--bg-base)]",
-          "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
-          variantStyles[variant],
-          sizeStyles[size],
-          className
-        )}
-        {...props}
-      >
+    const isClickDisabled = disabled || isLoading;
+    const baseClassName = cn(
+      // Base styles
+      "inline-flex items-center justify-center font-medium",
+      "transition-all duration-150 ease-in-out",
+      "cursor-pointer select-none whitespace-nowrap",
+      "focus-visible:outline-none focus-visible:ring-2",
+      "focus-visible:ring-[var(--accent-500)] focus-visible:ring-offset-2",
+      "focus-visible:ring-offset-[var(--bg-base)]",
+      "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+      variantStyles[variant],
+      sizeStyles[size],
+      className
+    );
+
+    const innerContent = (
+      <>
         {isLoading ? (
           <Spinner />
         ) : leftIcon ? (
@@ -121,6 +121,25 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {!isLoading && rightIcon && (
           <span className="shrink-0">{rightIcon}</span>
         )}
+      </>
+    );
+
+    if (asChild && React.isValidElement(children)) {
+      return React.cloneElement(children as React.ReactElement<any>, {
+        ref,
+        className: cn(baseClassName, (children.props as any).className),
+        ...props,
+      });
+    }
+
+    return (
+      <button
+        ref={ref}
+        disabled={isClickDisabled}
+        className={baseClassName}
+        {...props}
+      >
+        {innerContent}
       </button>
     );
   }

@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
-import { ClerkProvider, Show } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import Script from "next/script";
-import { AuthButtons } from "@/components/auth/AuthButtons";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { Navbar } from "@/components/shared/Navbar";
+import { ToastProvider } from "@/components/ui/Toast";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import "./globals.css";
 
 const inter = Inter({
@@ -57,11 +58,6 @@ export default function RootLayout({
       className={`${inter.variable} ${geistMono.variable}`}
     >
       <head>
-        {/*
-          Theme init via next/script with strategy="beforeInteractive" so it runs
-          before React hydrates and prevents flash of wrong theme.
-          Using next/script instead of raw <script> silences the React warning.
-        */}
         <Script id="theme-init" strategy="beforeInteractive">{`
           (function() {
             try {
@@ -76,20 +72,14 @@ export default function RootLayout({
       </head>
       <body className="min-h-dvh flex flex-col bg-[var(--bg-base)] text-[var(--text-primary)] antialiased">
         <ClerkProvider>
-          <header className="flex items-center justify-between px-6 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-card)]">
-            <span className="font-semibold text-[var(--text-primary)] tracking-tight">
-              Modulyn
-            </span>
-            <div className="flex items-center gap-3">
-              <Show when="signed-out">
-                <AuthButtons />
-              </Show>
-              <Show when="signed-in">
-                <UserMenu />
-              </Show>
-            </div>
-          </header>
-          {children}
+          <ToastProvider>
+            <Navbar />
+            <ErrorBoundary>
+              <main className="flex-1">
+                {children}
+              </main>
+            </ErrorBoundary>
+          </ToastProvider>
         </ClerkProvider>
       </body>
     </html>
