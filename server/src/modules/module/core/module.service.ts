@@ -21,8 +21,15 @@ const VALID_MODULE_TRANSITIONS: Record<ModuleState, ModuleState[]> = {
 export class ModuleCoreService {
   /**
    * Initializes a module boundary inside an event leveraging dynamic plugins implicitly.
+   * Tracks strict enforcement mapping the requestor natively against the core Event.
    */
-  async createModule(data: Prisma.ModuleUncheckedCreateInput) {
+  async createModule(data: Prisma.ModuleUncheckedCreateInput, requestorId: string) {
+    const event = await prisma.event.findUnique({ where: { id: data.eventId }, include: { organization: true } });
+    if (!event) throw new Error("Parent Event not found");
+    if (event.createdById !== requestorId && event.organization.ownerId !== requestorId) {
+      throw new Error("UNAUTHORIZED_ACCESS: You do not have permission to append modules under this Event.");
+    }
+
     // 1. Resolve handler explicitly mapped to native engine.
     const handler = resolveHandler(data.type);
 
@@ -32,9 +39,16 @@ export class ModuleCoreService {
     }
 
     // 3. Mount module inherently onto Prisma constraints globally.
-    return prisma.module.create({
+    const newModule = await prisma.module.create({
       data,
     });
+
+    // 4. Hook explicit module bootstrapper cleanly pushing flows downstream implicitly.
+    if (handler.init) {
+      await handler.init(newModule.id);
+    }
+
+    return newModule;
   }
 
   /**
@@ -50,9 +64,13 @@ export class ModuleCoreService {
   /**
    * Applies State Machine transition inherently triggering mapped plugins on validation securely.
    */
-  async transitionState(moduleId: string, targetState: ModuleState) {
-    const modObj = await prisma.module.findUnique({ where: { id: moduleId } });
+  async transitionState(moduleId: string, targetState: ModuleState, requestorId: string) {
+    const modObj = await prisma.module.findUnique({ where: { id: moduleId }, include: { event: { include: { organization: true } } } });
     if (!modObj) throw new Error("Module not found");
+
+    if (modObj.event.createdById !== requestorId && modObj.event.organization.ownerId !== requestorId) {
+      throw new Error("UNAUTHORIZED_ACCESS: You do not have permission to mutate this Module's lifecycle.");
+    }
 
     const allowed = VALID_MODULE_TRANSITIONS[modObj.state];
     if (!allowed.includes(targetState)) {

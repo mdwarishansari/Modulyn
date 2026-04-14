@@ -56,10 +56,21 @@ export const transitionEventState = asyncHandler(async (req: Request, res: Respo
   const { eventId } = req.params;
   const { state } = req.body;
 
-  const updatedEvent = await eventService.transitionState(eventId as string, state as EventState);
-
-  res.status(200).json({
-    success: true,
-    data: updatedEvent,
-  });
+  try {
+    const updatedEvent = await eventService.transitionState(eventId as string, state as EventState, req.user!.id);
+    res.status(200).json({
+      success: true,
+      data: updatedEvent,
+    });
+  } catch (error: any) {
+    if (error.message.includes("UNAUTHORIZED_ACCESS")) {
+      res.status(403).json({ success: false, message: error.message });
+      return;
+    }
+    if (error.message.includes("Invalid state transition")) {
+      res.status(400).json({ success: false, message: error.message });
+      return;
+    }
+    throw error;
+  }
 });

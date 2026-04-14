@@ -12,17 +12,24 @@ import { ModuleState } from "@prisma/client";
 export const createModule = asyncHandler(async (req: Request, res: Response) => {
   const { body } = createModuleSchema.parse({ body: req.body });
 
-  // Req.user strictly applied by requireAuth natively
-  const newModule = await moduleCoreService.createModule({
-    ...body,
-    configJsonb: body.configJsonb || {},
-    createdById: req.user!.id,
-  });
+  try {
+    const newModule = await moduleCoreService.createModule({
+      ...body,
+      configJsonb: body.configJsonb || {},
+      createdById: req.user!.id,
+    }, req.user!.id);
 
-  res.status(201).json({
-    success: true,
-    data: newModule,
-  });
+    res.status(201).json({
+      success: true,
+      data: newModule,
+    });
+  } catch (error: any) {
+    if (error.message.includes("UNAUTHORIZED_ACCESS")) {
+      res.status(403).json({ success: false, message: error.message });
+      return;
+    }
+    throw error;
+  }
 });
 
 export const getEventModules = asyncHandler(async (req: Request, res: Response) => {
@@ -39,10 +46,22 @@ export const transitionModuleState = asyncHandler(async (req: Request, res: Resp
   const { moduleId } = req.params;
   const { state } = req.body;
 
-  const alteredMod = await moduleCoreService.transitionState(moduleId as string, state as ModuleState);
+  try {
+    const alteredMod = await moduleCoreService.transitionState(moduleId as string, state as ModuleState, req.user!.id);
 
-  res.status(200).json({
-    success: true,
-    data: alteredMod,
-  });
+    res.status(200).json({
+      success: true,
+      data: alteredMod,
+    });
+  } catch (error: any) {
+    if (error.message.includes("UNAUTHORIZED_ACCESS")) {
+      res.status(403).json({ success: false, message: error.message });
+      return;
+    }
+    if (error.message.includes("Invalid state transition")) {
+      res.status(400).json({ success: false, message: error.message });
+      return;
+    }
+    throw error;
+  }
 });

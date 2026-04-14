@@ -18,6 +18,11 @@ export interface ModuleHandler {
   validateConfig?: (configJson: Prisma.JsonValue) => Promise<void>;
 
   /**
+   * Hook invoked natively explicitly when this Module type is inserted into Prisma dynamically.
+   */
+  init?: (moduleId: string) => Promise<void>;
+
+  /**
    * Hook invoked directly after the module lifecycle shifts.
    * e.g. DRAFT -> REGISTRATION_OPEN
    */

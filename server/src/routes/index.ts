@@ -11,8 +11,9 @@ import { Router, Request, Response } from "express";
 import userRoutes         from "@modules/user/user.routes";
 import orgRoutes          from "@modules/organization/organization.routes";
 import eventRoutes        from "@modules/event/event.routes";
-import moduleRoutes       from "@modules/module/module.routes";
+import moduleRoutes       from "@modules/module/core/module.routes";
 import registrationRoutes from "@modules/registration/registration.routes";
+import teamRoutes         from "@modules/team/team.routes";
 
 const router = Router();
 
@@ -31,5 +32,6 @@ router.use("/organizations", orgRoutes);
 router.use("/events",        eventRoutes);
 router.use("/modules",       moduleRoutes);
 router.use("/registrations", registrationRoutes);
+router.use("/teams",         teamRoutes);
 
 export default router;

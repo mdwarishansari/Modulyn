@@ -61,10 +61,16 @@ export class EventService {
 
   /**
    * Safely attempts to change an Event's state, preventing illegal transitions.
+   * Enforces strict ownership implicitly preventing unauthorized actors natively.
    */
-  async transitionState(eventId: string, targetState: EventState) {
-    const event = await prisma.event.findUnique({ where: { id: eventId } });
+  async transitionState(eventId: string, targetState: EventState, requestorId: string) {
+    const event = await prisma.event.findUnique({ where: { id: eventId }, include: { organization: true } });
     if (!event) throw new Error("Event not found");
+
+    // Strict Enforcement Boundary
+    if (event.createdById !== requestorId && event.organization.ownerId !== requestorId) {
+       throw new Error("UNAUTHORIZED_ACCESS: You do not have permission to modify this Event's lifecycle.");
+    }
 
     const allowed = VALID_TRANSITIONS[event.state];
     if (!allowed.includes(targetState)) {
