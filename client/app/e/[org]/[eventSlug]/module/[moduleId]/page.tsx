@@ -263,7 +263,7 @@ export default function ModulePage() {
   const canSubmit = isRegistered && module.state === "LIVE" && !submission;
 
   return (
-    <div className="mx-auto max-w-[var(--container-xl)] px-4 sm:px-6 py-8">
+    <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
       {/* Breadcrumb */}
       <nav className="text-xs text-[var(--text-muted)] mb-4 flex items-center gap-1.5">
         <Link href="/" className="hover:text-[var(--accent-500)]">Home</Link>

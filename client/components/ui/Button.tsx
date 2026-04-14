@@ -105,6 +105,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       "focus-visible:ring-[var(--accent-500)] focus-visible:ring-offset-2",
       "focus-visible:ring-offset-[var(--bg-base)]",
       "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+      // Micro interactions
+      "active:scale-[0.97]",
       variantStyles[variant],
       sizeStyles[size],
       className

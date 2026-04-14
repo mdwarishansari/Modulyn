@@ -38,7 +38,7 @@ function SidebarLink({ href, label, icon }: { href: string; label: string; icon:
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-[var(--container-xl)] px-4 sm:px-6 py-8">
+    <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
         <aside className="lg:w-56 shrink-0">

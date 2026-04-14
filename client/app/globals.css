@@ -437,3 +437,172 @@ code {
 .no-transition * {
   transition: none !important;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LAYOUT UTILITIES
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Consistent page container — use on every page root div */
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 640px) {
+  .page-container { padding-left: 1.5rem; padding-right: 1.5rem; }
+}
+@media (min-width: 1024px) {
+  .page-container { padding-left: 2rem; padding-right: 2rem; }
+}
+
+/* Section vertical spacing */
+.section-py { padding-top: 3rem; padding-bottom: 3rem; }
+@media (min-width: 640px) { .section-py { padding-top: 4rem; padding-bottom: 4rem; } }
+@media (min-width: 1024px) { .section-py { padding-top: 5rem; padding-bottom: 5rem; } }
+
+/* ─── Micro Interactions ────────────────────────────────────────────────────── */
+.hover-lift {
+  transition: transform var(--duration-normal) var(--ease-default),
+              box-shadow var(--duration-normal) var(--ease-default);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CLERK UI OVERRIDES
+   Map Clerk's internal CSS variables to our design tokens.
+   These override Clerk's default appearance without using the appearance prop.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Card / root container */
+.cl-card,
+.cl-rootBox {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Header */
+.cl-headerTitle {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+}
+.cl-headerSubtitle {
+  color: var(--text-secondary) !important;
+  font-size: 0.875rem !important;
+}
+
+/* Divider text */
+.cl-dividerText { color: var(--text-muted) !important; }
+.cl-dividerLine  { background-color: var(--border-default) !important; }
+
+/* Social buttons */
+.cl-socialButtonsBlockButton {
+  background-color: var(--bg-subtle) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  transition: background-color 150ms, border-color 150ms !important;
+}
+.cl-socialButtonsBlockButton:hover {
+  background-color: var(--bg-muted) !important;
+  border-color: var(--border-strong) !important;
+}
+
+/* Form labels */
+.cl-formFieldLabel {
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+}
+
+/* Form inputs */
+.cl-formFieldInput {
+  background-color: var(--bg-base) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  font-size: 0.875rem !important;
+  height: 2.5rem !important;
+  transition: border-color 150ms, box-shadow 150ms !important;
+}
+.cl-formFieldInput:focus {
+  border-color: var(--accent-500) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-500) 20%, transparent) !important;
+  outline: none !important;
+}
+.cl-formFieldInput::placeholder { color: var(--text-muted) !important; }
+
+/* Primary action button */
+.cl-formButtonPrimary {
+  background-color: var(--accent-500) !important;
+  border-radius: var(--radius-md) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  height: 2.5rem !important;
+  transition: background-color 150ms, transform 150ms !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+.cl-formButtonPrimary:hover  { background-color: var(--accent-600) !important; transform: translateY(-1px) !important; }
+.cl-formButtonPrimary:active { background-color: var(--accent-700) !important; transform: scale(0.97) !important; }
+
+/* Footer links */
+.cl-footerActionLink {
+  color: var(--accent-500) !important;
+  font-weight: 500 !important;
+}
+.cl-footerActionLink:hover { color: var(--accent-600) !important; }
+.cl-footerActionText { color: var(--text-muted) !important; }
+
+/* Internal link */
+.cl-identityPreviewText  { color: var(--text-primary) !important; }
+.cl-identityPreviewEditButton { color: var(--accent-500) !important; }
+
+/* Error messages */
+.cl-formFieldErrorText {
+  color: var(--status-error) !important;
+  font-size: 0.75rem !important;
+}
+.cl-alertText { color: var(--text-primary) !important; }
+.cl-alert[data-type="danger"] {
+  background-color: var(--status-error-bg) !important;
+  border-color: color-mix(in srgb, var(--status-error) 25%, transparent) !important;
+}
+
+/* User button (avatar) */
+.cl-userButtonAvatarBox {
+  width: 2rem !important;
+  height: 2rem !important;
+  border-radius: var(--radius-full) !important;
+}
+.cl-userButtonPopoverCard {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+.cl-userButtonPopoverActionButton {
+  color: var(--text-secondary) !important;
+}
+.cl-userButtonPopoverActionButton:hover {
+  background-color: var(--bg-subtle) !important;
+  color: var(--text-primary) !important;
+}
+.cl-userButtonPopoverActionButtonText { color: inherit !important; }
+
+/* Badge */
+.cl-badge {
+  background-color: var(--accent-50) !important;
+  color: var(--accent-600) !important;
+  border: 1px solid var(--accent-200) !important;
+  border-radius: var(--radius-full) !important;
+}

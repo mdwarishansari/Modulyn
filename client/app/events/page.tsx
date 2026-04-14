@@ -40,7 +40,7 @@ export default function EventsPage() {
   }, [events, stateFilter, debouncedSearch]);
 
   return (
-    <div className="mx-auto max-w-[var(--container-xl)] px-4 sm:px-6 py-10">
+    <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-16">
       <PageHeader
         title="Events"
         description="Browse all events from clubs, departments, and organizations."
